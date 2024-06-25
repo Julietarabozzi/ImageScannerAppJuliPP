@@ -1,12 +1,6 @@
-//
-//  ContentView.swift
-//  ImageScannerAppJuliPP
-//
-//  Created by Artekium on 23/06/2024.
-//
-
 import SwiftUI
 import RealityKit
+import ARKit
 
 struct ContentView : View {
     var body: some View {
@@ -17,30 +11,59 @@ struct ContentView : View {
 struct ARViewContainer: UIViewRepresentable {
     
     func makeUIView(context: Context) -> ARView {
-        
         let arView = ARView(frame: .zero)
-
-        // Create a cube model
-        let mesh = MeshResource.generateBox(size: 0.1, cornerRadius: 0.005)
-        let material = SimpleMaterial(color: .gray, roughness: 0.15, isMetallic: true)
-        let model = ModelEntity(mesh: mesh, materials: [material])
-        model.transform.translation.y = 0.05
-
-        // Create horizontal plane anchor for the content
-        let anchor = AnchorEntity(.plane(.horizontal, classification: .any, minimumBounds: SIMD2<Float>(0.2, 0.2)))
-        anchor.children.append(model)
-
-        // Add the horizontal plane anchor to the scene
-        arView.scene.anchors.append(anchor)
+        
+        // Configura ARView para reconocer imágenes
+        let configuration = ARWorldTrackingConfiguration()
+        if let referenceImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil) {
+            configuration.detectionImages = referenceImages
+            configuration.maximumNumberOfTrackedImages = 1
+        }
+        arView.session.run(configuration)
+        arView.session.delegate = context.coordinator
 
         return arView
-        
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {}
     
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    class Coordinator: NSObject, ARSessionDelegate {
+        func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+            for anchor in anchors {
+                if let imageAnchor = anchor as? ARImageAnchor {
+                    let referenceImage = imageAnchor.referenceImage
+                    let imageName = referenceImage.name ?? ""
+
+                    // Aquí puedes mapear la imagen reconocida a un enlace
+                    let link = getLink(for: imageName)
+
+                    // Abre el enlace
+                    if let url = URL(string: link) {
+                        DispatchQueue.main.async {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                }
+            }
+        }
+
+        private func getLink(for imageName: String) -> String {
+            // Implementa aquí tu lógica para mapear la imagen al enlace correspondiente
+            switch imageName {
+            case "exampleImage":
+                return "https://drive.google.com/drive/folders/1Ky8EV7xtMc9VxcaGM05Xks9YjiaryHbf?usp=drive_link"
+            default:
+                return "https://drive.google.com/drive/folders/1Ky8EV7xtMc9VxcaGM05Xks9YjiaryHbf?usp=drive_link"
+            }
+        }
+    }
 }
 
 #Preview {
     ContentView()
 }
+
