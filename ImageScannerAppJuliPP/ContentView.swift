@@ -55,9 +55,9 @@ struct ARViewContainer: UIViewRepresentable {
             // Implementa aquí tu lógica para mapear la imagen al enlace correspondiente
             switch imageName {
             case "exampleImage":
-                return "https://drive.google.com/drive/folders/1Ky8EV7xtMc9VxcaGM05Xks9YjiaryHbf?usp=drive_link"
+                return "https://drive.google.com/drive/folders/1G2U0O4UjBRhbHKK1dx4oibKITHt4u_XK?usp=drive_link"
             default:
-                return "https://drive.google.com/drive/folders/1Ky8EV7xtMc9VxcaGM05Xks9YjiaryHbf?usp=drive_link"
+                return "https://drive.google.com/drive/folders/1G2U0O4UjBRhbHKK1dx4oibKITHt4u_XK?usp=drive_link"
             }
         }
     }
